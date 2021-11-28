@@ -229,20 +229,16 @@ class Query implements QueryMapperInterface
 			$conditionStr = '';
 
 			if(is_array($condition['value'])) { // we have an array of value, probably for an IN condition or something
-				$arrayString = '';
 				foreach($condition['value'] as $value) {
 					$this->parameters[$condition['name'].'_'.$this->index] = $value;
-					$arrayString.= ':'.$condition['name'].'_'.$this->index++.',';
+					$conditionStr.= ':'.$condition['name'].'_'.$this->index++.',';
 				}
-				$arrayString = rtrim($arrayString, ',');
-
-				$str .= $condition['operator']?->value." \u{0060}".str_replace("\u{0060}", "\u{0060}\u{0060}", $condition['name'])."\u{0060} ".$condition['comparator']?->value.' ('.$arrayString.') ';
-			} else {
+				$conditionStr = ' ('. rtrim($conditionStr, ',') .') ';
+			} else { // we have a simple value
 				$this->parameters[$condition['name'].'_'.$this->index] = $condition['value'];
-				// $this->queryString.= '('.str_replace($condition['name'], $condition['name'].'_'.$this->index++, $sql).')';
-
-				$str .= $condition['operator']?->value." \u{0060}".str_replace("\u{0060}", "\u{0060}\u{0060}", $condition['name'])."\u{0060} ".$condition['comparator']?->value.' :'.$condition['name'].'_'.$this->index++.' ';
+				$conditionStr = ' :'.$condition['name'].'_'.$this->index++.' ';
 			}
+			$str .= $condition['operator']?->value." \u{0060}".str_replace("\u{0060}", "\u{0060}\u{0060}", $condition['name'])."\u{0060} ".$condition['comparator']?->value.$conditionStr;
 		}
 
 		return $str;
