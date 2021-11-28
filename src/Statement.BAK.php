@@ -5,7 +5,7 @@ namespace Reflexive\Core;
 use PDO;
 use PDOStatement;
 
-class Statement extends PDOStatement
+class StatementBAK extends PDOStatement
 {
 	public $pdo;
 
@@ -32,7 +32,7 @@ class Statement extends PDOStatement
 		// print_r(array_values(get_class_methods(self::class)));
 	}
 
-	public function execute(?array $inputParameters = null)
+	public function execute(?array $inputParameters = null): bool
 	{
 // 		if(self::$debug && !$this->o) {
 // 			ob_start();

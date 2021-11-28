@@ -7,8 +7,8 @@ use Reflexive\Core\Database as DB;
 abstract class ModelDAO implements SCRUDInterface
 {
 	const TABLE_NAME = '';
-	const DATABASE_CONNECTION_ID = 'data';
 	protected static $className = 'Member';
+	public static $database;
 
 	const dateTime = 'Y-m-d H:i:s';
 
@@ -16,19 +16,12 @@ abstract class ModelDAO implements SCRUDInterface
 	{
 		$cc = get_called_class();
 
-		return '`'.DB::getDatabaseById(self::DATABASE_CONNECTION_ID)->getTablePrefix().$cc::TABLE_NAME.'`';
-	}
-
-	protected static function getConnectionId(): string
-	{
-		$cc = get_called_class();
-
-		return $cc::DATABASE_CONNECTION_ID;
+		return '`'.$cc::TABLE_NAME.'`';
 	}
 
 	protected static function getInstance(): ?\PDO
 	{
-		return DB::getInstanceById(self::DATABASE_CONNECTION_ID);
+		return self::$database;
 	}
 
 	protected static function beginTransaction(): bool
@@ -67,22 +60,18 @@ abstract class ModelDAO implements SCRUDInterface
 
 	protected static function _search(array $on, string $combinator = 'OR', int $limit = null, int $offset = null): array
 	{
-		try {
-			$statement = self::prepare('SELECT * FROM '.self::getTableName());
-			$statement->setLimit($limit);
-			$statement->setOffset($offset);
+		$statement = self::prepare('SELECT * FROM '.self::getTableName());
+		$statement->setLimit($limit);
+		$statement->setOffset($offset);
 
-			$statement->setCombinator($combinator);
-			$statement->autoBindClause(':id', @$on['id'], 'id = :id');
+		$statement->setCombinator($combinator);
+		$statement->autoBindClause(':id', @$on['id'], 'id = :id');
 
-			$statement->execute();
+		$statement->execute();
 
-			while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
-				$objects[$rs->id] = new static::$className();
-				$objects[$rs->id]->setId($rs->id);
-			}
-		} catch (PDOException $e) {
-			throw new DAOException($e);
+		while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
+			$objects[$rs->id] = new static::$className();
+			$objects[$rs->id]->setId($rs->id);
 		}
 
 		return $objects;
@@ -92,22 +81,18 @@ abstract class ModelDAO implements SCRUDInterface
 	{
 		$objects = array();
 
-		try {
-			$statement = self::prepare('SELECT * FROM '.self::getTableName());
-			$statement->setLimit($limit);
-			$statement->setOffset($offset);
+		$statement = self::prepare('SELECT * FROM '.self::getTableName());
+		$statement->setLimit($limit);
+		$statement->setOffset($offset);
 
-			$statement->setCombinator($combinator);
-			$statement->autoBindClause(':id', @$on['id'], 'id = :id');
+		$statement->setCombinator($combinator);
+		$statement->autoBindClause(':id', @$on['id'], 'id = :id');
 
-			$statement->execute();
+		$statement->execute();
 
-			while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
-				$objects[$rs->id] = new static::$className();
-				$objects[$rs->id]->setId($rs->id);
-			}
-		} catch (PDOException $e) {
-			throw new DAOException($e);
+		while ($rs = $statement->getStatement()->fetch(PDO::FETCH_OBJ)) {
+			$objects[$rs->id] = new static::$className();
+			$objects[$rs->id]->setId($rs->id);
 		}
 
 		return $objects;

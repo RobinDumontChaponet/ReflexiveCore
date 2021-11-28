@@ -2,100 +2,131 @@
 
 namespace Reflexive\Core;
 
-use PDO;
-use Exception;
-use PDOException;
+use PDO, PDOStatement;
 
-class Database
+// Lazy PDO wrapper (and optional singleton register thingy for those who want to use one…)
+
+class Database extends PDO
 {
     private static $PDOInstances = array();
     private static $databases = array();
+	private static $defaultOptions = [
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+		PDO::ATTR_EMULATE_PREPARES => false,
+		PDO::ATTR_PERSISTENT => false,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+	];
 
-    private $dbType;
-    private $dbHost;
-    private $dbPort;
-    private $dbUser;
-    private $dbPwd;
-    private $tablePrefix;
-    private $buffered;
+	private $connected = false;
 
-    public function __construct(string $dbName, string  $dbUser, string $dbPwd = '', string $dbType = 'mysql', string $dbHost = 'localhost', string $dbPort = '3306', string $tablePrefix = '', bool $buffered = true)
-    {
-        $this->dbType = $dbType;
-        $this->dbHost = $dbHost;
-        $this->dbPort = $dbPort;
-        $this->dbUser = $dbUser;
-        $this->dbPwd = $dbPwd;
-        $this->dbName = $dbName;
-        $this->tablePrefix = $tablePrefix;
-		$this->buffered = $buffered;
-    }
+    public function __construct(
+		private string $dsn,
+		private ?string $user = null,
+		private ?string $password = null,
+		private array $options = [],
+	)
+	{}
 
-    public function getTablePrefix(): string
-    {
-        return $this->tablePrefix;
-    }
+	private function connect()
+	{
+		if (!$this->connected) {
+			parent::__construct(
+				$this->dsn,
+				$this->user,
+				$this->password,
+				array_replace(self::$defaultOptions, $this->options)
+			);
+			$this->connected = true;
+		}
+	}
 
-    public function setTablePrefix(string $value): void
-    {
-        $this->tablePrefix = $value;
-    }
+	public static function once(
+		string $dsn,
+		string $user = null,
+		string $password = null,
+		array $options = [],
+	): ?static
+	{
+        if (!isset(self::$PDOInstances[$dsn])) {
+			self::$PDOInstances[$dsn] = new self(
+				$dsn,
+				$user,
+				$password,
+				$options,
+			);
+		}
 
-    public static function addDatabase(string $id, self $database): void
-    {
-        self::$databases[$id] = $database;
-    }
+		return self::$PDOInstances[$dsn];
+	}
 
-    public function getInstance(): ?PDO
-    {
-        if (!isset(self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser])) {
-            try {
-                $pdo = new PDO(
-                    $this->dbType.':host='.$this->dbHost.';port='.$this->dbPort.';dbname='.$this->dbName,
-                    $this->dbUser,
-                    $this->dbPwd,
-                    array(
-                        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_PERSISTENT => false,
-						PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => $this->buffered,
-                    )
-                );
-
-                $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Reflexive\Core\Statement', array($pdo)));
-                // Set prepared statement emulation depending on server version - thx to https://stackoverflow.com/a/10455228
-                $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, version_compare($pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '5.1.17', '<'));
-
-                self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser] = $pdo;
-            } catch (PDOException $e) {
-                echo '<b>Error '.__METHOD__.' </b> '.$e->getMessage().'<br />'.PHP_EOL;
-            }
-        }
-
-        return self::$PDOInstances[$this->dbType.':'.$this->dbName.','.$this->dbUser];
-    }
-
-    public static function getInstanceById($id): ?PDO {
-        if(!isset(self::$databases[$id]))
-            throw new Exception('Error '.__METHOD__.' : Database with id "'.$id.'" does not exist in database pool.'.PHP_EOL);
-        return self::$databases[$id]->getInstance();
-    }
-
-    public static function getDatabaseById($id): ?self
-    {
-        return self::$databases[$id];
-    }
-
-    private function __clone()
-    {
-        throw new Exception('Error '.__METHOD__.' : You shall not clone.'.PHP_EOL);
-    }
-
-    public function __destruct()
-    {
-        foreach(self::$PDOInstances as $PDOInstance) {
-            $PDOInstance = null;
-            unset($PDOInstance);
-        }
-    }
+	public function beginTransaction(): bool
+	{
+		$this->connect();
+		return parent::beginTransaction();
+	}
+	public function commit(): bool
+	{
+		$this->connect();
+		return parent::commit();
+	}
+	public function errorCode(): string
+	{
+		$this->connect();
+		return parent::errorCode();
+	}
+	public function errorInfo(): array
+	{
+		$this->connect();
+		return parent::errorInfo();
+	}
+	public function exec(string $statement): int
+	{
+		$this->connect();
+		return parent::exec($statement);
+	}
+	public function getAttribute(int $attribute): mixed
+	{
+		$this->connect();
+		return parent::getAttribute($attribute);
+	}
+	// public static function getAvailableDrivers(): array
+	// {
+	// 	return self::getAvailableDrivers();
+	// }
+	public function inTransaction(): bool
+	{
+		$this->connect();
+		return parent::inTransaction();
+	}
+	public function lastInsertId(string $name = null): string
+	{
+		$this->connect();
+		return parent::lastInsertId($name);
+	}
+	public function prepare(string $statement, array $driver_options = array()): PDOStatement
+	{
+		$this->connect();
+		return parent::prepare($statement, $driver_options);
+	}
+	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement
+	{
+		$this->connect();
+		return parent::query($query, $fetchMode, ...$fetchModeArgs);
+	}
+	public function quote(string $string, int $parameter_type = PDO::PARAM_STR): string
+	{
+		$this->connect();
+		return parent::quote($string, $parameter_type);
+	}
+	public function rollBack(): bool
+	{
+		$this->connect();
+		return parent::rollBack();
+	}
+	public function setAttribute(int $attribute, mixed $value): bool
+	{
+		$this->connect();
+		return parent::setAttribute($attribute, $value);
+	}
 }
