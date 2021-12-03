@@ -2,7 +2,7 @@
 
 namespace Reflexive\Core;
 
-use Reflexive\Core\Comparator;
+use Core\Comparator;
 
 interface SCRUDInterface
 {
