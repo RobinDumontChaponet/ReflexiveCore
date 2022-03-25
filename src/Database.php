@@ -8,8 +8,8 @@ use PDO, PDOStatement;
 
 class Database extends PDO
 {
-    private static $PDOInstances = array();
-    private static $databases = array();
+    private static $PDOInstances = [];
+    private static $databases = [];
 	private static $defaultOptions = [
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_EMULATE_PREPARES => false,
@@ -104,7 +104,7 @@ class Database extends PDO
 		$this->connect();
 		return parent::lastInsertId($name);
 	}
-	public function prepare(string $statement, array $driver_options = array()): PDOStatement
+	public function prepare(string $statement, array $driver_options = []): PDOStatement
 	{
 		$this->connect();
 		return parent::prepare($statement, $driver_options);
