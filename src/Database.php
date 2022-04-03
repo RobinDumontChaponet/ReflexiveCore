@@ -9,7 +9,7 @@ use PDO, PDOStatement;
 class Database extends PDO
 {
     private static $PDOInstances = [];
-    private static $databases = [];
+    // private static $databases = [];
 	private static $defaultOptions = [
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_EMULATE_PREPARES => false,
@@ -58,6 +58,24 @@ class Database extends PDO
 		}
 
 		return self::$PDOInstances[$dsn];
+	}
+
+	public function __sleep(): array
+	{
+		return [
+			'dsn',
+			'user',
+			'password',
+			'options',
+		];
+	}
+
+	public function __debugInfo() {
+		return [
+			'dsn' => $this->dsn,
+			'user' => $this->user,
+			'options' => $this->options,
+		];
 	}
 
 	public function beginTransaction(): bool
