@@ -122,12 +122,12 @@ class Database extends PDO
 		$this->connect();
 		return parent::lastInsertId($name);
 	}
-	public function prepare(string $statement, array $driver_options = []): PDOStatement
+	public function prepare(string $statement, array $driver_options = []): PDOStatement|false
 	{
 		$this->connect();
 		return parent::prepare($statement, $driver_options);
 	}
-	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement
+	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
 	{
 		$this->connect();
 		return parent::query($query, $fetchMode, ...$fetchModeArgs);
