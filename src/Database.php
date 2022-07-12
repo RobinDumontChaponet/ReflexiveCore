@@ -22,7 +22,7 @@ class Database extends PDO
 
     public function __construct(
 		private string $dsn,
-		private ?string $user = null,
+		private ?string $username = null,
 		private ?string $password = null,
 		private array $options = [],
 	)
@@ -33,7 +33,7 @@ class Database extends PDO
 		if (!$this->connected) {
 			parent::__construct(
 				$this->dsn,
-				$this->user,
+				$this->username,
 				$this->password,
 				array_replace(self::$defaultOptions, $this->options)
 			);
@@ -43,7 +43,7 @@ class Database extends PDO
 
 	public static function once(
 		string $dsn,
-		string $user = null,
+		string $username = null,
 		string $password = null,
 		array $options = [],
 	): ?static
@@ -51,7 +51,7 @@ class Database extends PDO
         if (!isset(self::$PDOInstances[$dsn])) {
 			self::$PDOInstances[$dsn] = new self(
 				$dsn,
-				$user,
+				$username,
 				$password,
 				$options,
 			);
@@ -73,7 +73,7 @@ class Database extends PDO
 	public function __debugInfo() {
 		return [
 			'dsn' => $this->dsn,
-			'user' => $this->user,
+			'user' => $this->username,
 			'options' => $this->options,
 		];
 	}
