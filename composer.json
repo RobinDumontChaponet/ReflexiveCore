@@ -1,6 +1,6 @@
 {
 	"name": "reflexive/core",
-	"description": "Description is coming",
+	"description": "Lazy PDO connection and some enums…",
 	"type": "library",
 	"license": "MIT",
 	"authors": [
