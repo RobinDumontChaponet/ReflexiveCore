@@ -8,9 +8,9 @@ use PDO, PDOStatement;
 
 class Database extends PDO
 {
-    private static $PDOInstances = [];
+    private static array $PDOInstances = [];
     // private static $databases = [];
-	private static $defaultOptions = [
+	private static array $defaultOptions = [
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_EMULATE_PREPARES => false,
 		PDO::ATTR_PERSISTENT => false,
@@ -18,7 +18,7 @@ class Database extends PDO
 		PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 	];
 
-	private $connected = false;
+	private bool $connected = false;
 
     public function __construct(
 		private string $dsn,
@@ -28,7 +28,7 @@ class Database extends PDO
 	)
 	{}
 
-	private function connect()
+	private function connect(): void
 	{
 		if (!$this->connected) {
 			parent::__construct(
@@ -88,11 +88,13 @@ class Database extends PDO
 		$this->connect();
 		return parent::commit();
 	}
-	public function errorCode(): string
+	public function errorCode(): ?string
 	{
 		$this->connect();
 		return parent::errorCode();
 	}
+
+	/** @psalm-suppress LessSpecificImplementedReturnType */
 	public function errorInfo(): array
 	{
 		$this->connect();
@@ -127,6 +129,8 @@ class Database extends PDO
 		$this->connect();
 		return parent::prepare($statement, $driver_options);
 	}
+
+	/** @psalm-suppress PossiblyNullArgument */
 	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
 	{
 		$this->connect();
