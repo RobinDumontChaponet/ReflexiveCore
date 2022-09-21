@@ -21,7 +21,7 @@ class Database extends PDO
 	private bool $connected = false;
 
     public function __construct(
-		private string $dsn,
+		public string $dsn,
 		private ?string $username = null,
 		private ?string $password = null,
 		private array $options = [],
