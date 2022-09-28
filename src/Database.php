@@ -15,7 +15,6 @@ class Database extends PDO
 		PDO::ATTR_EMULATE_PREPARES => false,
 		PDO::ATTR_PERSISTENT => false,
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-		PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 	];
 
 	private bool $connected = false;
@@ -26,7 +25,10 @@ class Database extends PDO
 		private ?string $password = null,
 		private array $options = [],
 	)
-	{}
+	{
+		if(defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
+			self::$defaultOptions[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = true;
+	}
 
 	private function connect(): void
 	{
