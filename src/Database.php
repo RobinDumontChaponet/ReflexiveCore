@@ -30,6 +30,11 @@ class Database extends PDO
 			self::$defaultOptions[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = true;
 	}
 
+	public function getDSNPrefix(): ?string
+	{
+		return preg_match('/(\w+):/m', $this->dsn, $matches)? $matches[1] : null;
+	}
+
 	private function connect(): void
 	{
 		if (!$this->connected) {
