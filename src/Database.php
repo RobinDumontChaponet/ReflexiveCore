@@ -50,8 +50,8 @@ class Database extends PDO
 
 	public static function once(
 		string $dsn,
-		string $username = null,
-		string $password = null,
+		?string $username = null,
+		?string $password = null,
 		array $options = [],
 	): ?static
 	{
@@ -126,7 +126,7 @@ class Database extends PDO
 		$this->connect();
 		return parent::inTransaction();
 	}
-	public function lastInsertId(string $name = null): string
+	public function lastInsertId(?string $name = null): string
 	{
 		$this->connect();
 		return parent::lastInsertId($name);
