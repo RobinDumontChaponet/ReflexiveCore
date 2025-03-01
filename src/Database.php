@@ -35,7 +35,7 @@ class Database extends PDO
 		return preg_match('/(\w+):/m', $this->dsn, $matches)? $matches[1] : null;
 	}
 
-	private function connect(): void
+	private function _connect(): void
 	{
 		if (!$this->connected) {
 			parent::__construct(
@@ -87,34 +87,34 @@ class Database extends PDO
 
 	public function beginTransaction(): bool
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::beginTransaction();
 	}
 	public function commit(): bool
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::commit();
 	}
 	public function errorCode(): ?string
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::errorCode();
 	}
 
 	/** @psalm-suppress LessSpecificImplementedReturnType */
 	public function errorInfo(): array
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::errorInfo();
 	}
 	public function exec(string $statement): int
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::exec($statement);
 	}
 	public function getAttribute(int $attribute): mixed
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::getAttribute($attribute);
 	}
 	// public static function getAvailableDrivers(): array
@@ -123,39 +123,39 @@ class Database extends PDO
 	// }
 	public function inTransaction(): bool
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::inTransaction();
 	}
 	public function lastInsertId(?string $name = null): string
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::lastInsertId($name);
 	}
 	public function prepare(string $statement, array $driver_options = []): PDOStatement|false
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::prepare($statement, $driver_options);
 	}
 
 	/** @psalm-suppress PossiblyNullArgument */
 	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::query($query, $fetchMode, ...$fetchModeArgs);
 	}
 	public function quote(string $string, int $parameter_type = PDO::PARAM_STR): string
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::quote($string, $parameter_type);
 	}
 	public function rollBack(): bool
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::rollBack();
 	}
 	public function setAttribute(int $attribute, mixed $value): bool
 	{
-		$this->connect();
+		$this->_connect();
 		return parent::setAttribute($attribute, $value);
 	}
 }
