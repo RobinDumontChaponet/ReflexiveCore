@@ -8,8 +8,8 @@ use PDO, PDOStatement;
 
 class Database extends PDO
 {
-    private static array $PDOInstances = [];
-    // private static $databases = [];
+	private static array $PDOInstances = [];
+	// private static $databases = [];
 	private static array $defaultOptions = [
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_EMULATE_PREPARES => false,
@@ -19,15 +19,15 @@ class Database extends PDO
 
 	private bool $connected = false;
 
-    public function __construct(
+	public function __construct(
 		public string $dsn,
 		private ?string $username = null,
 		private ?string $password = null,
 		private array $options = [],
 	)
 	{
-		if(defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY'))
-			self::$defaultOptions[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = true;
+		if(defined('PDO\MYSQL::ATTR_USE_BUFFERED_QUERY'))
+			self::$defaultOptions[PDO\MYSQL::ATTR_USE_BUFFERED_QUERY] = true;
 	}
 
 	public function getDSNPrefix(): ?string
@@ -37,7 +37,7 @@ class Database extends PDO
 
 	private function _connect(): void
 	{
-		if (!$this->connected) {
+		if(!$this->connected) {
 			parent::__construct(
 				$this->dsn,
 				$this->username,
@@ -55,7 +55,7 @@ class Database extends PDO
 		array $options = [],
 	): ?static
 	{
-        if (!isset(self::$PDOInstances[$dsn])) {
+		if(!isset(self::$PDOInstances[$dsn])) {
 			self::$PDOInstances[$dsn] = new self(
 				$dsn,
 				$username,
