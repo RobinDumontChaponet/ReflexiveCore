@@ -13,9 +13,11 @@ abstract class Condition
 	protected function __construct(
 		string $name,
 		Comparator $comparator,
+		mixed $value
 	) {
 		$this->name = $name;
 		$this->comparator = $comparator;
+		$this->value = $value;
 	}
 
 	public static function EQUAL(string $name, mixed $value): static

@@ -6,6 +6,7 @@ use PDO, PDOStatement;
 
 // Lazy PDO wrapper (and optional singleton register thingy for those who want to use one…)
 
+/** @psalm-api */
 class Database extends PDO
 {
 	private static array $PDOInstances = [];
@@ -26,8 +27,8 @@ class Database extends PDO
 		private array $options = [],
 	)
 	{
-		if(defined('PDO\MYSQL::ATTR_USE_BUFFERED_QUERY'))
-			self::$defaultOptions[PDO\MYSQL::ATTR_USE_BUFFERED_QUERY] = true;
+		if(defined('\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY'))
+			self::$defaultOptions[\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY] = true;
 	}
 
 	public function getDSNPrefix(): ?string
@@ -85,16 +86,21 @@ class Database extends PDO
 		];
 	}
 
+	#[\Override]
 	public function beginTransaction(): bool
 	{
 		$this->_connect();
 		return parent::beginTransaction();
 	}
+
+	#[\Override]
 	public function commit(): bool
 	{
 		$this->_connect();
 		return parent::commit();
 	}
+
+	#[\Override]
 	public function errorCode(): ?string
 	{
 		$this->_connect();
@@ -102,16 +108,21 @@ class Database extends PDO
 	}
 
 	/** @psalm-suppress LessSpecificImplementedReturnType */
+	#[\Override]
 	public function errorInfo(): array
 	{
 		$this->_connect();
 		return parent::errorInfo();
 	}
+
+	#[\Override]
 	public function exec(string $statement): int
 	{
 		$this->_connect();
 		return parent::exec($statement);
 	}
+
+	#[\Override]
 	public function getAttribute(int $attribute): mixed
 	{
 		$this->_connect();
@@ -121,38 +132,50 @@ class Database extends PDO
 	// {
 	// 	return self::getAvailableDrivers();
 	// }
+
+	#[\Override]
 	public function inTransaction(): bool
 	{
 		$this->_connect();
 		return parent::inTransaction();
 	}
+
+	#[\Override]
 	public function lastInsertId(?string $name = null): string
 	{
 		$this->_connect();
 		return parent::lastInsertId($name);
 	}
-	public function prepare(string $statement, array $driver_options = []): PDOStatement|false
+
+	#[\Override]
+	public function prepare(string $query, array $options = []): PDOStatement|false
 	{
 		$this->_connect();
-		return parent::prepare($statement, $driver_options);
+		return parent::prepare($query, $options);
 	}
 
-	/** @psalm-suppress PossiblyNullArgument */
+	#[\Override]
 	public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement|false
 	{
 		$this->_connect();
 		return parent::query($query, $fetchMode, ...$fetchModeArgs);
 	}
-	public function quote(string $string, int $parameter_type = PDO::PARAM_STR): string
+
+	#[\Override]
+	public function quote(string $string, int $type = PDO::PARAM_STR): string
 	{
 		$this->_connect();
-		return parent::quote($string, $parameter_type);
+		return parent::quote($string, $type);
 	}
+
+	#[\Override]
 	public function rollBack(): bool
 	{
 		$this->_connect();
 		return parent::rollBack();
 	}
+
+	#[\Override]
 	public function setAttribute(int $attribute, mixed $value): bool
 	{
 		$this->_connect();
