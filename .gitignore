@@ -4,6 +4,7 @@ composer.lock
 docs/
 doxygen-config
 coverage.clover
+.phpunit.cache
 .php_cs.cache
 .DS_Store
 .nova
