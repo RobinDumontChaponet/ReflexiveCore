@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Reflexive\Core;
 
-abstract class ConditionGroup
+abstract class ConditionGroup implements \Countable
 {
 	protected array $conditions = [];
 	protected ?Operator $nextOperator = null;
@@ -40,6 +40,7 @@ abstract class ConditionGroup
 		return $this->conditions;
 	}
 
+	#[\Override]
 	public function count(): int
 	{
 		return count($this->conditions);

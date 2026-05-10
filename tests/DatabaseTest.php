@@ -28,6 +28,7 @@ final class DatabaseTest extends TestCase
 
 		self::assertSame('sqlite', $database->getDSNPrefix());
 		self::assertNull((new Database('memory'))->getDSNPrefix());
+		self::assertNull((new Database('memory sqlite:'))->getDSNPrefix());
 	}
 
 	// Verifies the PDO connection opens only when first used.
@@ -69,6 +70,15 @@ final class DatabaseTest extends TestCase
 		self::assertNotSame($first, $third);
 	}
 
+	// Verifies Database::once respects late static binding.
+	public function testOnceReturnsTheCalledSubclass(): void
+	{
+		$databaseFile = $this->temporaryDatabaseFile();
+		$database = TestDatabase::once('sqlite:'.$databaseFile);
+
+		self::assertInstanceOf(TestDatabase::class, $database);
+	}
+
 	private function temporaryDatabaseFile(): string
 	{
 		$databaseFile = tempnam(sys_get_temp_dir(), 'reflexive-core-');
@@ -78,4 +88,8 @@ final class DatabaseTest extends TestCase
 
 		return $databaseFile;
 	}
+}
+
+final class TestDatabase extends Database
+{
 }

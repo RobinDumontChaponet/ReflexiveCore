@@ -17,8 +17,11 @@ final class StringsTest extends TestCase
 	{
 		yield 'qualified identifier' => ['users.email', '`users`.`email`'];
 		yield 'sql function' => ['COUNT(*)', 'COUNT(*)'];
+		yield 'function argument' => ['COUNT(users.id)', 'COUNT(`users`.`id`)'];
+		yield 'alias' => ['users.email AS email', '`users`.`email` AS `email`'];
 		yield 'already quoted' => ['`already_quoted`', '`already_quoted`'];
 		yield 'comma separated identifiers' => ['first_name, last_name', '`first_name`, `last_name`'];
+		yield 'string literal' => ["status = 'active'", "`status` = 'active'"];
 	}
 
 	// Verifies identifier quoting while preserving SQL functions.

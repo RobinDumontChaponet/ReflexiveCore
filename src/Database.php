@@ -30,7 +30,7 @@ class Database extends PDO
 
 	public function getDSNPrefix(): ?string
 	{
-		return preg_match('/(\w+):/m', $this->dsn, $matches)? $matches[1] : null;
+		return preg_match('/^([a-z][a-z0-9_]*):/i', $this->dsn, $matches)? strtolower($matches[1]) : null;
 	}
 
 	private function _connect(): void
@@ -60,10 +60,12 @@ class Database extends PDO
 		?string $username = null,
 		?string $password = null,
 		array $options = [],
-	): ?static
+	): static
 	{
-		if(!isset(self::$PDOInstances[$dsn])) {
-			self::$PDOInstances[$dsn] = new self(
+		$key = static::class."\0".$dsn; // forgot about subclassing…
+
+		if(!isset(self::$PDOInstances[$key])) {
+			self::$PDOInstances[$key] = new static(
 				$dsn,
 				$username,
 				$password,
@@ -71,7 +73,7 @@ class Database extends PDO
 			);
 		}
 
-		return self::$PDOInstances[$dsn];
+		return self::$PDOInstances[$key];
 	}
 
 	public function __sleep(): array
@@ -122,7 +124,7 @@ class Database extends PDO
 	}
 
 	#[\Override]
-	public function exec(string $statement): int
+	public function exec(string $statement): int|false
 	{
 		$this->_connect();
 		return parent::exec($statement);
@@ -168,7 +170,7 @@ class Database extends PDO
 	}
 
 	#[\Override]
-	public function quote(string $string, int $type = PDO::PARAM_STR): string
+	public function quote(string $string, int $type = PDO::PARAM_STR): string|false
 	{
 		$this->_connect();
 		return parent::quote($string, $type);

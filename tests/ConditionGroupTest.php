@@ -28,6 +28,7 @@ final class ConditionGroupTest extends TestCase
 		$conditions = array_values($group->getConditions());
 
 		self::assertSame(3, $group->count());
+		self::assertCount(3, $group);
 		self::assertTrue($group->hasConditions());
 		self::assertSame($first, $conditions[0]['condition']);
 		self::assertNull($conditions[0]['operator']);
