@@ -26,10 +26,7 @@ class Database extends PDO
 		private ?string $password = null,
 		private array $options = [],
 	)
-	{
-		if(defined('\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY'))
-			self::$defaultOptions[\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY] = true;
-	}
+	{}
 
 	public function getDSNPrefix(): ?string
 	{
@@ -39,11 +36,20 @@ class Database extends PDO
 	private function _connect(): void
 	{
 		if(!$this->connected) {
+			$options = array_replace(self::$defaultOptions, $this->options);
+
+			if(
+				$this->getDSNPrefix() === 'mysql'
+				&& defined('\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY')
+				&& !array_key_exists(\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY, $options)
+			)
+				$options[\Pdo\Mysql::ATTR_USE_BUFFERED_QUERY] = true;
+
 			parent::__construct(
 				$this->dsn,
 				$this->username,
 				$this->password,
-				array_replace(self::$defaultOptions, $this->options)
+				$options
 			);
 			$this->connected = true;
 		}
